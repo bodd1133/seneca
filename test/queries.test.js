@@ -1,10 +1,12 @@
 const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const rewire = require('rewire')
-const queries = require('./../helpers/queries')
-const sinon = require('sinon')
+let Queries = require('./../helpers/queries')
 const Promise = require('bluebird')
 
+chai.should();
 const { expect } = chai;
+chai.use(chaiAsPromised);
 
 const mockClient = class mockClient {
   constructor() { }
@@ -12,40 +14,39 @@ const mockClient = class mockClient {
   end() { return {}; }
   query(sql) {
     if (sql.indexOf('INSERT') !== -1) {
-      return {}
+      return Promise.resolve('Data Inserted')
     } else
-      return {
+      return Promise.resolve({
         rows: [{ avg: 10, sum: 50 }]
-      };
+      });
   }
 };
 
-describe('Queries helper functions', () => {
-  let client;
+const userId = 1;
+const courseId = 1;
+
+describe.only('Queries helper functions', () => {
+  let queries;
   describe('create event missing parameter', () => {
+    before(() => { queries = new Queries(userId, courseId) })
     it('should return appropriate error response', () => {
-      return queries.createEvent(1, 2)
+      return queries.createEvent(1)
         .catch((err) => {
           expect(err.message).to.eql('Empty parameter supplied');
           expect(err).to.be.instanceOf(Error);
         })
     })
   })
-  describe.only('create event missing parameter', () => {
+  describe('create event', () => {
     before(() => {
-      // Queries = rewire('./../helpers/queries');
-      // Queries.__set__('Client', mockClient);
-      sinon.stub(client, 'query').returns(Promise.resolve('boo'))
+      Queries = rewire('./../helpers/queries');
+      Queries.__set__('Client', mockClient);
+      queries = new Queries(userId, courseId)
     })
-    it('should return appropriate error response', () => {
-      return queries.createEvent(1, 1, 1, 1)
-        .then((res) => { console.log(res) })
-        .catch((err) => {
-          console.log(err)
-        })
-    })
+    it('should return success message', () => queries.createEvent(1, 1).should.eventually.eql('Data Inserted'))
   })
   describe('retrieve events missing parameter', () => {
+    before(() => { queries = new Queries(userId, courseId) })
     it('should return appropriate error response', () => {
       return queries.retrieveEvents()
         .catch((err) => {
@@ -54,5 +55,12 @@ describe('Queries helper functions', () => {
         })
     })
   })
-
+  describe('retrieve events', () => {
+    before(() => {
+      Queries = rewire('./../helpers/queries');
+      Queries.__set__('Client', mockClient);
+      queries = new Queries(userId, courseId)
+    })
+    it('should return summary data', () => queries.retrieveEvents(1, 1).should.eventually.eql({ avg: 10, sum: 50 }))
+  })
 })
