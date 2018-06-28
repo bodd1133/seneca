@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 app.post('/courses/:courseId', async (req, res) => {
   try {
-    queries = new Queries(req.headers.userid, req.params.courseId)
+    queries = new Queries(parseInt(req.headers.userid), parseInt(req.params.courseId))
     await queries.createEvent(req.body.total, req.body.timeStudied)
     res.status(200).send()
   } catch (err) {
@@ -21,7 +21,7 @@ app.post('/courses/:courseId', async (req, res) => {
 
 app.get('/courses/:courseId', async (req, res) => {
   try {
-    queries = new Queries(req.headers.userid, req.params.courseId)
+    queries = new Queries(parseInt(req.headers.userid), parseInt(req.params.courseId))
     const re = await queries.retrieveEvents()
     res.status(200).send({ averageScore: parseFloat(re.avg.toFixed(1)), totalTimeStudied: parseFloat(re.sum.toFixed(1)) })
   } catch (err) {

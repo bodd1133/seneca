@@ -1,23 +1,12 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const Promise = require('bluebird')
 const sinon = require('sinon')
-let app = require('./../app')
+const app = require('./../app')
 let Queries = require('./../helpers/queries')
+const testData = require('./testData')
 
 chai.should();
 chai.use(chaiHttp);
-
-const userId = 1;
-const courseId = 1;
-
-const headers = {
-  userid: userId
-}
-const body = {
-  total: 10,
-  timeStudied: 20
-}
 
 describe('APIs', () => {
   describe('post to the create endpoint and receive error', () => {
@@ -29,9 +18,9 @@ describe('APIs', () => {
 
     it('should catch and return appropriate error response', async () => {
       await chai.request(app)
-        .post(`/courses/${courseId}`)
-        .set(headers)
-        .send(body)
+        .post(`/courses/${testData.courseId1}`)
+        .set(testData.headers)
+        .send(testData.body)
         .then((err) => {
           err.res.statusCode.should.eql(400)
           err.res.text.should.eql('Parameter missing')
@@ -47,9 +36,9 @@ describe('APIs', () => {
 
     it('should return successful response', async () => {
       await chai.request(app)
-        .post(`/courses/${courseId}`)
-        .set(headers)
-        .send(body)
+        .post(`/courses/${testData.courseId1}`)
+        .set(testData.headers)
+        .send(testData.body)
         .then((res) => { res.status.should.eql(200) })
     })
   })
@@ -63,8 +52,8 @@ describe('APIs', () => {
 
     it('should catch and return appropriate error response', async () => {
       await chai.request(app)
-        .get(`/courses/${courseId}`)
-        .set(headers)
+        .get(`/courses/${testData.courseId1}`)
+        .set(testData.headers)
         .then((err) => {
           err.res.statusCode.should.eql(400)
           err.res.text.should.eql('Parameter missing')
@@ -80,8 +69,8 @@ describe('APIs', () => {
 
     it('should return successful response', async () => {
       await chai.request(app)
-        .get(`/courses/${courseId}`)
-        .set(headers)
+        .get(`/courses/${testData.courseId1}`)
+        .set(testData.headers)
         .then((res) => {
           res.statusCode.should.eql(200)
           res.body.should.eql({ averageScore: 10.3, totalTimeStudied: 50 })

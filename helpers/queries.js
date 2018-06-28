@@ -1,5 +1,5 @@
 let { Client } = require('pg');
-const connectionString = 'postgres://localhost:5432/postgres'
+const connectionString = 'postgres://localhost:5432/postgres';
 const Promise = require('bluebird')
 
 module.exports = class Queries {
