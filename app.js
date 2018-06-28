@@ -1,29 +1,34 @@
 const express = require('express')
-const queries = require('./helpers/queries.js')
+const Queries = require('./helpers/queries.js')
+var bodyParser = require('body-parser');
+const app = express()
 
-let app = express();
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
-app.listen(3000)
+app.use(bodyParser.json());
 
-app.get('/', () => {
-  'Welcome to the Seneca Web Client App'
-})
-
-app.post('/courses/:courseId', (req, res) => {
+app.post('/courses/:courseId', async (req, res) => {
   try {
-    await queries.createEvent(req.header.UserId, req.params.courseId, req.body.total, req.body.timeStudied)
+    queries = new Queries(req.headers.userid, req.params.courseId)
+    await queries.createEvent(req.body.total, req.body.timeStudied)
     res.status(200).send()
   } catch (err) {
-    res.status(400)
+    res.status(400).send(err.message)
   }
 })
 
-app.get('/courses/{courseId}', (req, res) => {
+app.get('/courses/:courseId', async (req, res) => {
   try {
-    const res = await queries.retrieveEvents(req.header.UserId, req.params.courseId)
-    res.status(200).send({ averageScore: res.avg.toFixed(1), timeStudied: res.sum.toFixed(1) })
+    queries = new Queries(req.headers.userid, req.params.courseId)
+    const re = await queries.retrieveEvents()
+    res.status(200).send({ averageScore: parseFloat(re.avg.toFixed(1)), totalTimeStudied: parseFloat(re.sum.toFixed(1)) })
   } catch (err) {
-    res.status(400)
+    res.status(400).send(err.message)
   }
 })
 
+module.exports = app.listen(4000, () => {
+  console.log('Express app listening on port 4000')
+})

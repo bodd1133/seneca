@@ -25,7 +25,7 @@ const mockClient = class mockClient {
 const userId = 1;
 const courseId = 1;
 
-describe.only('Queries helper functions', () => {
+describe('Queries helper functions', () => {
   let queries;
   describe('create event missing parameter', () => {
     before(() => { queries = new Queries(userId, courseId) })
