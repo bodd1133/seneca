@@ -23,7 +23,7 @@ app.get('/courses/:courseId', async (req, res) => {
   try {
     queries = new Queries(parseInt(req.headers.userid), parseInt(req.params.courseId))
     const re = await queries.retrieveEvents()
-    res.status(200).send({ averageScore: parseFloat(re.avg.toFixed(1)), totalTimeStudied: parseFloat(re.sum.toFixed(1)) })
+    res.status(200).send({ averageScore: parseFloat(parseFloat(re.avg).toFixed(1)), totalTimeStudied: parseFloat(re.sum) })
   } catch (err) {
     res.status(400).send(err.message)
   }
