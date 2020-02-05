@@ -16,6 +16,7 @@ module.exports = class Queries {
       await client.connect();
       const res = await client.query(`INSERT INTO events VALUES (DEFAULT, ${this.userId}, ${this.courseId}, ${total}, ${time})`);
       await client.end();
+      console.log('HERE')
       return res
     } catch (err) { throw err }
   }
